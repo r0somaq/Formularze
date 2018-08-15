@@ -31,6 +31,7 @@
                             <th>Urodziny</th>
                             <th>Aktywnosc</th>
                             <th>Tagi</th>
+                            <th>Avatar</th>
                             <th>Kasuj/Edycja</th>
                         </tr>
                     </thead>
@@ -54,6 +55,7 @@
                             <th>Urodziny</th>
                             <th>Aktywnosc</th>
                             <th>Tagi</th>
+                            <th>Avatar</th>
                             <th>Kasuj/Edycja</th>
                         </tr>
                     </thead>
@@ -122,7 +124,7 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">Plec</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control" style="width: 66%" name="gender">
+                                    <select class="form-control gender" style="width: 66%" name="gender">
                                         <option value="m">Mezczyzna</option>
                                         <option value="k" selected>Kobieta</option>
                                     </select>
@@ -135,8 +137,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6" id="tagsAddWorker">
+                        <div class="col-sm-3" id="tagsAddWorker">
                             <!-- TU BEDZIE CHECKBOX z TAGAMi  -->
+                            <div hidden>
+                                <label class="checkbox">
+                                    <input name="tags" type="checkbox" checked hidden>
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 avatarWorker">
+                            <!-- TU BEDZIE RADIO z AVATARAMi  -->
+                            <input type="radio" name="avatar" value="1" checked /><img src="img/females/1.png" alt="avatar nr: 1">
+                            <br />
+                            <br />
+                            <input type="radio" name="avatar" value="2" /><img src="img/females/2.png" alt="avatar nr: 2">
+                            <br />
+                            <br />
+                            <input type="radio" name="avatar" value="3" /><img src="img/females/3.png" alt="avatar nr: 3">
                         </div>
                     </form>
                 </div>
@@ -202,10 +220,23 @@
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <!-- TU BEDZIE MULTISELECT Z TAGAMI-->
-                            <select multiple class="form-control" name="tags" id="selectTags">
-
-                            </select>
+                            <div class="cols-sm-12">
+                                <!-- TU BEDZIE MULTISELECT Z TAGAMI-->
+                                <select multiple class="form-control" name="tags" id="selectTags">
+                                </select>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="cols-sm-12 avatarWorker">
+                                <!-- TU BEDZIE RADIO z AVATARAMi  -->
+                                <input type="radio" name="avatar" value="1" checked /><img src="img/females/1.png" alt="avatar nr: 1">
+                                <br />
+                                <br />
+                                <input type="radio" name="avatar" value="2" /><img src="img/females/2.png" alt="avatar nr: 2">
+                                <br />
+                                <br />
+                                <input type="radio" name="avatar" value="3" /><img src="img/females/3.png" alt="avatar nr: 3">
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -254,6 +285,7 @@
             </div>
         </div>
     </div>
+    <div>Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
     <script type="text/javascript">
         
         $(document).ready(function(){
@@ -266,63 +298,3 @@
     </script>
 </body>
 </html>
- <!--
-                <form id="form2">
-                    <label>Imie</label>
-                    <input type="text" name="first_name" />
-                    <br />
-                    <label>Nazwisko</label>
-                    <input type="text" name="last_name" />
-                    <br />
-                    <label>Telefon</label>
-                    <input type="text" name="phone" />
-                    <br />
-                    <label>E-mail</label>
-                    <input type="text" name="email" />
-                    <br />
-                    <label>Data urodzin</label>
-                    <input type="text" name="birthdate" />
-                    <br />
-                    <label>Aktywny2</label>
-                    <input type="radio" name="is_active" value="1" checked />Tak
-                    <input type="radio" name="is_active" value="0" />Nie
-                    <br />
-                    <label>Plec</label>
-                    <select name="gender" disabled>
-                        <option value="m" >Mezczyzna</option>
-                        <option value="k" selected >Kobieta</option>
-                    </select>
-                    <br />
-                    <input type="submit" value="Zapisz" id="pstrykEdycja" /> 
-                </form>
-                -->
-                <!--
-                <form id="form1">
-                    <label>Imie</label>
-                    <input type="text" name="first_name" />
-                    <br />
-                    <label>Nazwisko</label>
-                    <input type="text" name="last_lastname" />
-                    <br />
-                    <label>Telefon</label>
-                    <input type="text" name="phone" />
-                    <br />
-                    <label>E-mail</label>
-                    <input type="text" name="email" />
-                    <br />
-                    <label>Data urodzin</label>
-                    <input type="text" name="birthdate" />
-                    <br />
-                    <label>Aktywny2</label>
-                    <input type="radio" name="is_active" value="1" checked />Tak
-                    <input type="radio" name="is_active" value="0" />Nie
-                    <br />
-                    <label>Plec</label>
-                    <select name="gender">
-                        <option value="m" >Mezczyzna</option>
-                        <option value="k" selected >Kobieta</option>
-                    </select>
-                    <br />
-                    <input type="submit" value="Dodaj do data" id="pstrykDane" />
-                </form> 
-                -->

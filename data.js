@@ -1,27 +1,67 @@
-// FORMULARZ EDYCJA NIE DZIALA
-
+//obsluga avatarow + fix -> przy braku zaznaczonych tagow w formularzu dodawania nie dodawal do obiektu pustego arraya
 var data = {
     males: [
-        {first_name: 'Adam', last_name: 'Nowak', phone: 123456789, email: 'test1@gmail.com', birthdate: '1987-09-09', is_active: true, tags: ['swiat'] },
-        {first_name: 'Krystian', last_name: 'Kowalski', phone: 690626528, email: 'test2@gmail.com', birthdate: '1950-01-07', is_active: false, tags: [] },
-        {first_name: 'Daniel', last_name: 'Swoboda', phone: 619873218, email: 'test3@gmail.com', birthdate: '1920-05-03', is_active: true, tags: [] },
-        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test4@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [] }
+        {first_name: 'Adam', last_name: 'Nowak', phone: 123456789, email: 'test1@gmail.com', birthdate: '1987-09-09', is_active: true, tags: ['swiat'], avatar: 1 },
+        {first_name: 'Krystian', last_name: 'Kowalski', phone: 690626528, email: 'test2@gmail.com', birthdate: '1950-01-07', is_active: false, tags: [], avatar: 1},
+        {first_name: 'Daniel', last_name: 'Swoboda', phone: 619873218, email: 'test3@gmail.com', birthdate: '1920-05-03', is_active: true, tags: [], avatar: 1},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test4@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 1}
 
     ],
     females: [
-        {first_name: 'Kasia', last_name: 'Dabrowska', phone: 764259746, email: 'test5@gmail.com', birthdate: '1985-12-15', is_active: false, tags: ['swiat'] },
-        {first_name: 'Basia', last_name: 'Brzozowska', phone: 159753456, email: 'test6@gmail.com', birthdate: '1958-04-12', is_active: true, tags: [] },
-        {first_name: 'Renia', last_name: 'Lipowska', phone: 125748356, email: 'test7@gmail.com', birthdate: '1975-09-30', is_active: false, tags: [] },
-        {first_name: 'Xenia', last_name: 'Kasztanska', phone: 234867795, email: 'test8@gmail.com', birthdate: '1949-03-16', is_active: true, tags: ['swiat', 'bielsko'] }
+        {first_name: 'Kasia', last_name: 'Dabrowska', phone: 764259746, email: 'test5@gmail.com', birthdate: '1985-12-15', is_active: false, tags: ['swiat'], avatar: 1},
+        {first_name: 'Basia', last_name: 'Brzozowska', phone: 159753456, email: 'test6@gmail.com', birthdate: '1958-04-12', is_active: true, tags: [], avatar: 1},
+        {first_name: 'Renia', last_name: 'Lipowska', phone: 125748356, email: 'test7@gmail.com', birthdate: '1975-09-30', is_active: false, tags: [], avatar: 1},
+        {first_name: 'Xenia', last_name: 'Kasztanska', phone: 234867795, email: 'test8@gmail.com', birthdate: '1949-03-16', is_active: true, tags: ['swiat', 'bielsko'], avatar: 1}
     ]
 }
-//var edit = 0;
+
 var tagi = [
     {tagName: 'swiat', tagDescript: 'tag dotyczacy swiata'},
     {tagName: 'bielsko', tagDescript: 'tag dotyczacy Bielska'}
 ]
 
 var kolorki = ['#453523', '#978409', '#908734', '#213345', '#516794', '#127948'];
+
+function avatar(form) { //funkcja do wyswietlania avatarow przy edycji/dodawaniu
+    console.log(form);
+    var avaDiv = form.querySelector('.avatarWorker');
+    var options = form.querySelectorAll('select[name="gender"] option');
+    var plec;
+
+    options.forEach(function(option) {
+
+        if (option.selected)
+        plec = (option.value == 'k')? 'females' : 'males';
+
+    })
+    
+    while (avaDiv.firstChild)
+    avaDiv.removeChild(avaDiv.firstChild);
+
+    for (var i = 1; i < 4; i++) {
+        
+        var input = document.createElement('input');
+        input.type = 'radio';
+
+        if (i == 1) //defaultowy check
+        input.checked = true;
+
+        input.name = 'avatar';
+        input.value = i;
+        avaDiv.appendChild(input);
+
+        var img = document.createElement('img');
+        img.src = 'img/' + plec + '/' + i + '.png';
+        //img.dataset.sex = plec; nie wiem czy potrzebne
+        //img.dataset.avatar = i;
+        img.alt = 'avatar nr : ' + i;
+        avaDiv.appendChild(img);
+        
+        avaDiv.appendChild(document.createElement('br'));
+        avaDiv.appendChild(document.createElement('br'));
+        
+    }
+};
 
 function refreshTags(oldTag, newTag, action) {
     
@@ -64,30 +104,33 @@ function refreshTags(oldTag, newTag, action) {
     }
 
     clear('form3');
-}
+};
+
 function clear(formId){
 
     var form = document.getElementById(formId);
     var inputs = form.querySelectorAll('input[type="text"],textarea, input[name="tags"]:checked');
     form.removeAttribute('data-row');
     
-   //if (formId == 'form1' || formId == 'form2') {
-   //    document.getElementById('pstrykEdycja').setAttribute('disabled', 'disabled');   
-   //}
-
     var count = inputs.length;
     
     for (var i = 0; i < count; i++) {
         
-        if (inputs[i].getAttribute('name') == 'tags') // pobrane do inputs sa tylko checkboxy z checked true
-        inputs[i].checked = false;
+        if (inputs[i].getAttribute('name') == 'tags' && !(inputs[i].hasAttribute('hidden'))) {
+            
+            inputs[i].checked = false;
 
-        inputs[i].value = '';
-        inputs[i].classList.remove('error')
+        }
+        else {
 
+            inputs[i].value = '';
+            inputs[i].classList.remove('error')
+        
+        }
     }
 
-}
+};
+
 function validate(formId, exception) {
 
     var form = document.getElementById(formId);
@@ -272,7 +315,7 @@ function petlaTagi(init) {
             tags.appendChild(newOption);
         })
     } 
-}
+};
 
 var petla = function(plecTabela, plec) {
    
@@ -324,11 +367,17 @@ var petla = function(plecTabela, plec) {
                 td.innerHTML = wsad;
 
             }
-            //else if (kolumna == 'tags') {
-            //    console.log(wartosc);
-//
-            //    td.innerHTML = wartosc;//.toString();
-            //}
+            else if (kolumna == 'avatar') {
+                
+                //pobieramy avatar i wsadzamy do tabeli
+                var img = document.createElement('img');
+                img.src = 'img/' + plec + '/' + wartosc + '.png';
+                //img.dataset.sex = plec; // nie wiem czy potrzebne
+                //img.dataset.avatar = wartosc;
+                img.alt = 'avatar nr: ' + wartosc;
+                td.appendChild(img);
+                
+            }
             else {
                     td.innerHTML = wartosc;
             }
@@ -397,6 +446,8 @@ var petla = function(plecTabela, plec) {
             var plecValue = (plec == 'males')? 'm' : 'k';
             form.querySelector('select').value = plecValue;
             
+            avatar(form);
+
             if (form.hasAttribute('data-deleted'))
             form.removeAttribute('data-deleted');
 
@@ -455,6 +506,10 @@ var petla = function(plecTabela, plec) {
 
 var addEvents = function() {  
     
+    $('.gender').change(function(e) {
+        avatar(e.target.form);
+    });
+
     $('.pstryczek').click(function() {
         
         var cls = $(this).attr('data-class');
@@ -480,7 +535,6 @@ var addEvents = function() {
   
         var form = document.getElementById('form1');
         var inputs = form.querySelectorAll('input[type="text"], input[type="radio"]:checked, select:not([name="gender"]), input[type="checkbox"]:checked'); //dwa radia// wszystkie selecty poza tymi ktore maja name -> gender
-       
         var plec = (form.querySelector('select').value == 'k')? 'females' : 'males';
         var targetTable = ( plec == 'females')? 'tbodyKobiety' : 'tbodyMezczyzni';
 
@@ -500,11 +554,11 @@ var addEvents = function() {
             } 
             else if (keyName == 'tags') {
 
-                //console.log(inputs[i].nextElementSibling.innerText);
+                if (inputs[i].nextElementSibling.innerText != '') // zapobiega przed nieutworzeniem kolumny dla rekordu bez tagow
                 tagsTab.push(inputs[i].nextElementSibling.innerText); // dodajemy zawartosc spana przy checkboxie
                 dataToPush[keyName] = tagsTab; 
 
-            }
+            }   
             else {
                 
                 dataToPush[keyName] = inputs[i].value;
@@ -656,7 +710,5 @@ var addEvents = function() {
         }
 
     });
-
-    
 }
 
