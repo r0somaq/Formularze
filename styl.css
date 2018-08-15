@@ -1,0 +1,51 @@
+.badge-zielony {
+    background-color: green;
+}
+.badge-czerwony {
+    background-color: red;
+}
+.rozowy {
+    background-color: pink;
+}
+.niebieski {
+    background-color: cyan;
+}
+td, tr {
+    padding: 5px;
+}
+.bialy {
+    background-color: #ffffff;
+}
+h2 {
+    border-bottom-color: blue;
+    border-bottom-style: dashed;
+}
+
+#kobietyHead {
+    border-bottom-color: pink;
+}
+h3 {
+    border-bottom-color: red;
+    border-bottom-style: dashed;
+}
+.formularz1inputTextDefault {
+    background-color: #ffffff;
+}
+.formularz1inputTextEmptyArea {
+    background-color: red;
+}
+.checkbox {
+    padding: 10px;
+}
+/*
+
+*/
+
+
+
+.error {
+    border: 1px solid red;
+}
+.light {
+    background-color: yellow;
+}
