@@ -40,12 +40,12 @@ h3 {
 /*
 
 */
-
-
-
 .error {
     border: 1px solid red;
 }
 .light {
     background-color: yellow;
+}
+.tr-deactive {
+    display: none;
 }

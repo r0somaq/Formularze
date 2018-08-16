@@ -1,10 +1,15 @@
-//obsluga avatarow + fix -> przy braku zaznaczonych tagow w formularzu dodawania nie dodawal do obiektu pustego arraya
 var data = {
     males: [
         {first_name: 'Adam', last_name: 'Nowak', phone: 123456789, email: 'test1@gmail.com', birthdate: '1987-09-09', is_active: true, tags: ['swiat'], avatar: 1 },
         {first_name: 'Krystian', last_name: 'Kowalski', phone: 690626528, email: 'test2@gmail.com', birthdate: '1950-01-07', is_active: false, tags: [], avatar: 1},
         {first_name: 'Daniel', last_name: 'Swoboda', phone: 619873218, email: 'test3@gmail.com', birthdate: '1920-05-03', is_active: true, tags: [], avatar: 1},
-        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test4@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 1}
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test4@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 1},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test41@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 1},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test42@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 3},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test43@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 2},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test44@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 2},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test45@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 3},
+        {first_name: 'Wojtek', last_name: 'Hermaszewski', phone: 624433748, email: 'test46@gmail.com', birthdate: '1940-03-01', is_active: false, tags: [], avatar: 1}
 
     ],
     females: [
@@ -22,8 +27,78 @@ var tagi = [
 
 var kolorki = ['#453523', '#978409', '#908734', '#213345', '#516794', '#127948'];
 
+function checkPage(tbody) {
+
+    for (var tr of tbody.children) {
+
+        if (tr.dataset.page != tbody.dataset.page) {
+            tr.classList.add('tr-deactive');
+        }
+        else {
+            tr.classList.remove('tr-deactive');
+        }
+    }
+}
+
+function paginationTable(tbodyID, nrPP) { 
+
+    var tbody = document.getElementById(tbodyID); 
+    var allTr = tbody.children; 
+    var tbodyGender = (tbody.id == 'tbodyMezczyzni')? 'malePage' : 'femalePage';
+    var nrPP = nrPP; //liczba tr na strone paginacji
+
+    var allTrLen = allTr.length;
+    var page = 0; 
+
+    for ( var i = 0; i < allTrLen; i++) {
+
+        if (i % nrPP == 0)
+        page++;
+        allTr[i].classList.add(tbodyGender+page); //dodanie tr odpowiednich klas
+        allTr[i].dataset.page = page;
+    
+    }
+    var paginatorPage = Math.ceil((allTrLen/nrPP)); //liczba podstron
+    
+    var nav = tbody.parentElement.parentElement.querySelector('nav');
+    var ul = document.createElement('ul');
+    ul.classList.add('pagination');
+    
+    tbody.dataset.page = '1';
+    checkPage(tbody);
+
+    for (var i = 0; i < (paginatorPage); i++) {
+
+        var li = document.createElement('li');
+        if ( i == 0 )
+        li.classList.add('active');
+        var ahref = document.createElement('a');
+        ahref.setAttribute('href', '.' + ( tbodyGender + (i+1) ) );
+        ahref.innerText = i + 1;
+        ahref.onclick = function(e) {
+            
+            e.preventDefault();
+
+            var ul = e.target.parentElement.parentElement.children;
+            for (var li of ul) {li.classList.remove('active');}
+            //zmieniamy aktywny przycisk
+            e.target.parentElement.classList.add('active');
+
+            tbody.dataset.page = e.target.innerText;
+            checkPage(tbody);
+        };
+        li.appendChild(ahref);
+        ul.appendChild(li);
+    }
+
+    while (nav.firstChild)
+    nav.removeChild(nav.firstChild);
+    nav.appendChild(ul);
+
+}
+
 function avatar(form) { //funkcja do wyswietlania avatarow przy edycji/dodawaniu
-    console.log(form);
+
     var avaDiv = form.querySelector('.avatarWorker');
     var options = form.querySelectorAll('select[name="gender"] option');
     var plec;
@@ -129,6 +204,8 @@ function clear(formId){
         }
     }
 
+    form.querySelector('input[name="avatar"][value="1"]').checked = true;
+
 };
 
 function validate(formId, exception) {
@@ -151,7 +228,7 @@ function validate(formId, exception) {
         }
     } 
 
-    if (formId == 'form1' || formId == 'form2') { // przerobic jesli wystepuje plec/emailfield to wtedy to robic
+    if (formId == 'form1' || formId == 'form2') {
         
         var emailField = form.querySelector('input[name="email"')
         var formEmail = emailField.value;
@@ -183,7 +260,7 @@ function validate(formId, exception) {
 function petlaTagi(init) {
 
     var tbody = document.getElementById('tbodyTagi');
-    tbody.innerHTML = ""; // musi cos istniec
+    tbody.innerHTML = ""; 
     var count = tagi.length;
     for (var row =  0; row < count; row++) {
 
@@ -213,7 +290,7 @@ function petlaTagi(init) {
         
         deleteBtn.onclick = function(e) {
 
-            // sprawdzamy po elementach spany z nazwa tagu, jesli istnieja to je podswietlamy wszystkie a nastepnie wywalamy alert i przerywamy dzialanie delete buttona
+            // sprawdzamy po elementach spany z nazwa tagu, jesli istnieja to podswietlamy wszystkie tr'y z tagiem, a nastepnie wywalamy alert i przerywamy dzialanie delete buttona
             var tagExist = false;
             var tableWorkers = document.getElementsByClassName('table-workers');
             var tagToCheck = e.target.parentElement.querySelector('td[data-name]').innerText;
@@ -236,29 +313,12 @@ function petlaTagi(init) {
                 return;
                 
             }
-                        
-            //for (var plec in data) {
-            //    for (var row in data[plec]) {
-            //        for (var key in data[plec][row]) {
-            //            if (key == 'tags') {
-            //                for (var tag of data[plec][row][key]) {
-            //                    if (tag == tagToCheck) {
-            //                        alert('Nie mozna usunac tagu poniewaz jest on uzywany!')
-            //                        return;
-            //                    }
-            //                }
-            //            }
-            //            
-            //        }
-            //    }
-            //}
             
             if (!confirm('Are you sure to delete this record?'))
                 return;
 
             var btn = e.target;
             var row2 = btn.getAttribute('data-row'); 
-            //var index = tagi[row2];
             tagi.splice(row2, 1);
 
             // aktualizacja listy tagow w form1 i form2
@@ -268,7 +328,7 @@ function petlaTagi(init) {
         } 
         
         tr.appendChild(deleteBtn);
-        // EDIT BTN
+
         var editBtn = document.createElement('button');
         
         editBtn.innerHTML = 'Edytuj';
@@ -372,8 +432,6 @@ var petla = function(plecTabela, plec) {
                 //pobieramy avatar i wsadzamy do tabeli
                 var img = document.createElement('img');
                 img.src = 'img/' + plec + '/' + wartosc + '.png';
-                //img.dataset.sex = plec; // nie wiem czy potrzebne
-                //img.dataset.avatar = wartosc;
                 img.alt = 'avatar nr: ' + wartosc;
                 td.appendChild(img);
                 
@@ -381,7 +439,7 @@ var petla = function(plecTabela, plec) {
             else {
                     td.innerHTML = wartosc;
             }
-                
+            
             tr.appendChild(td);
                 
         }
@@ -390,14 +448,12 @@ var petla = function(plecTabela, plec) {
     
         deleteBtn.innerHTML = "Kasuj"; 
         deleteBtn.setAttribute('data-row', wiersz);
-
         deleteBtn.onclick = function(e) {
 
             if (!confirm('Are you sure to delete this record?'))
             return
             var btn = e.target;
             var row = btn.getAttribute('data-row'); 
-            //var index = data[plec][row];
             var form = document.getElementById('form2');
             
             form.dataset.deleted = row;
@@ -406,23 +462,21 @@ var petla = function(plecTabela, plec) {
                 
                 $('#slideForm').slideUp('slow');
                 clear('form2');
-                //form.removeAttribute('data-deleted');
 
             }
             else if (form.dataset.deleted < form.dataset.row && form.dataset.sex == e.target.parentElement.parentElement.getAttribute('id')) {
 
                 form.dataset.row -= 1;
-                //form.removeAttribute('data-deleted');
                 
             }
             form.removeAttribute('data-deleted');
 
             data[plec].splice(row, 1);
-            //form.removeAttribute('data-row');
             petla(plecTabela, plec);
             clear('form1');
-
-            // jesli skasujemy edytowany rekord to czyscimy formularz edycji
+            tbody.dataset.page = 1;
+            
+            paginationTable(tbody.id, 3); 
         } 
         
         tr.appendChild(deleteBtn);
@@ -454,13 +508,8 @@ var petla = function(plecTabela, plec) {
             for (var kolumna in data[plec][row]) {
 
                 var value = data[plec][row][kolumna];
-               
                 if (typeof(value) == 'boolean') {
                     
-                    //////////////form.querySelector('input[name="'+ kolumna +'"][checked]').removeAttribute('checked');
-                    ///////////////////var checkedOption = (value)? '1' : '0';
-                    ///////////////////form.querySelector('input[name="' + kolumna + '"][value="' + checkedOption + '"]').setAttribute('checked', true);
-
                     if (value == true) {
                         form.querySelector('input[name="' + kolumna + '"][value="1"]').checked = true;
                         form.querySelector('input[name="' + kolumna + '"][value="0"]').checked = false;
@@ -472,23 +521,29 @@ var petla = function(plecTabela, plec) {
                     
                 }
                 else if (typeof(value) == 'object') {
-
+                    
                     form.querySelector('select:not([name="gender"])').querySelectorAll('option').forEach(function(option) {
                         option.selected = false;
                     });
-
+                    
                     if (value !== 0) {
                         
                         value.forEach(function(elem) {
-
+                            
                             form.querySelector('option[name="'+ elem +'"]').selected = true;
                         })
                     }
                     
                 }
-                else {
+                else if (kolumna == 'avatar') {
 
-                    form.querySelector('input[name="' + kolumna + '"').value = value;
+                    console.log(kolumna, value);
+                    form.querySelector('input[name="' + kolumna + '"][value="' + value + '"]').checked = true;
+
+                }
+                else {
+                    
+                    form.querySelector('input[name="' + kolumna + '"]').value = value;
 
                 }
                 
@@ -497,15 +552,16 @@ var petla = function(plecTabela, plec) {
         }
 
         tr.appendChild(editBtn);
-
         tbody.appendChild(tr);
 
     }
 
+    paginationTable(tbody.id, 3);
+    console.log('run', plecTabela, tbody.id);
 };
 
 var addEvents = function() {  
-    
+
     $('.gender').change(function(e) {
         avatar(e.target.form);
     });
@@ -581,7 +637,7 @@ var addEvents = function() {
         var counter = $(this).attr('data-counter');
         var target = $(this).attr('data-target');                      
         
-        counter = parseInt(counter, 10); // niezdefiniowany jest counter, a nie data-counter, tak jakby var counter; -> tez jest undefined
+        counter = parseInt(counter, 10);
         
         if (isNaN(counter)) {
             counter = 0;
@@ -616,8 +672,7 @@ var addEvents = function() {
         if (sprawdzony == false)
             return;
 
-        var lastIteration = inputs.length; // w for mial juz liczbe calkowita inputow i na podstawie tego tworzyl kolejne kolumny
-
+        var lastIteration = inputs.length; 
         
         for (var i = 0; i < lastIteration; i++) {
             
@@ -643,7 +698,6 @@ var addEvents = function() {
             }
         }
         
-        //form.removeAttribute('data-row');
         petla(targetTable, plec);
         $('#slideForm').slideUp('slow');
         clear('form2');
@@ -672,14 +726,10 @@ var addEvents = function() {
 
                 var keyName = inputs[i].name;
                 
-                //var sprawdzony = validate('form3');
-                //if (sprawdzony == false)
-                //    return;
                 if (validate('form3') == false)
                     return;
 
                 tagi[row][keyName] = inputs[i].value;
-                console.log(keyName);
                 if (keyName == 'tagName') {
                     newTag = inputs[i].value;
                     oldTag = document.querySelector('#tbodyTagi').children[form.dataset.row].children[1].innerText;
@@ -708,7 +758,6 @@ var addEvents = function() {
             refreshTags(oldTag, newTag, 'add');
             
         }
-
     });
 }
 
