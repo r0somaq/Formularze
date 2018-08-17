@@ -1,3 +1,4 @@
+//aby zmienic liczbe rekordow na page znajdz wszystkie (2) 'paginationTable(tbody.id, 3)' w kodzie i zmien drugi parametr.
 var data = {
     males: [
         {first_name: 'Adam', last_name: 'Nowak', phone: 123456789, email: 'test1@gmail.com', birthdate: '1987-09-09', is_active: true, tags: ['swiat'], avatar: 1 },
@@ -27,10 +28,15 @@ var tagi = [
 
 var kolorki = ['#453523', '#978409', '#908734', '#213345', '#516794', '#127948'];
 
-function checkPage(tbody) {
+function checkPage(tbody, nrPP) {
 
     for (var tr of tbody.children) {
 
+        if (tbody.dataset.newtr == '1') {
+            tbody.dataset.page = Math.ceil((tbody.children.length/nrPP));
+            tbody.dataset.newtr == '0';
+        }
+        
         if (tr.dataset.page != tbody.dataset.page) {
             tr.classList.add('tr-deactive');
         }
@@ -38,13 +44,17 @@ function checkPage(tbody) {
             tr.classList.remove('tr-deactive');
         }
     }
+    if (tbody.querySelectorAll('tr:not([class="tr-deactive"])').length == 0) //w przypadku usuniecia ostatniego pozostalego rekordu w ostatnim page'u,wyswietlamy poprzedni page
+    tbody.dataset.page -= 1;
+    
+    if (tbody.dataset.page < 1)
+    tbody.dataset.page = '1';
 }
 
 function paginationTable(tbodyID, nrPP) { 
 
     var tbody = document.getElementById(tbodyID); 
     var allTr = tbody.children; 
-    var tbodyGender = (tbody.id == 'tbodyMezczyzni')? 'malePage' : 'femalePage';
     var nrPP = nrPP; //liczba tr na strone paginacji
 
     var allTrLen = allTr.length;
@@ -54,7 +64,7 @@ function paginationTable(tbodyID, nrPP) {
 
         if (i % nrPP == 0)
         page++;
-        allTr[i].classList.add(tbodyGender+page); //dodanie tr odpowiednich klas
+
         allTr[i].dataset.page = page;
     
     }
@@ -63,17 +73,13 @@ function paginationTable(tbodyID, nrPP) {
     var nav = tbody.parentElement.parentElement.querySelector('nav');
     var ul = document.createElement('ul');
     ul.classList.add('pagination');
-    
-    tbody.dataset.page = '1';
-    checkPage(tbody);
+
+    checkPage(tbody, nrPP);
 
     for (var i = 0; i < (paginatorPage); i++) {
 
         var li = document.createElement('li');
-        if ( i == 0 )
-        li.classList.add('active');
         var ahref = document.createElement('a');
-        ahref.setAttribute('href', '.' + ( tbodyGender + (i+1) ) );
         ahref.innerText = i + 1;
         ahref.onclick = function(e) {
             
@@ -87,6 +93,7 @@ function paginationTable(tbodyID, nrPP) {
             tbody.dataset.page = e.target.innerText;
             checkPage(tbody);
         };
+
         li.appendChild(ahref);
         ul.appendChild(li);
     }
@@ -95,6 +102,8 @@ function paginationTable(tbodyID, nrPP) {
     nav.removeChild(nav.firstChild);
     nav.appendChild(ul);
 
+    if (allTr.length > 0) //zapobiega wyskakiwaniu bledu przy usunieciu wszystkich rekordow z danej tabeli
+    nav.querySelector('.pagination').children[(tbody.dataset.page-1)].classList.add('active'); // zaznaczanie aktywnej strony (w paginatorze)
 }
 
 function avatar(form) { //funkcja do wyswietlania avatarow przy edycji/dodawaniu
@@ -474,9 +483,9 @@ var petla = function(plecTabela, plec) {
             data[plec].splice(row, 1);
             petla(plecTabela, plec);
             clear('form1');
-            tbody.dataset.page = 1;
-            
+            //tbody.dataset.page = 1;
             paginationTable(tbody.id, 3); 
+            
         } 
         
         tr.appendChild(deleteBtn);
@@ -537,7 +546,6 @@ var petla = function(plecTabela, plec) {
                 }
                 else if (kolumna == 'avatar') {
 
-                    console.log(kolumna, value);
                     form.querySelector('input[name="' + kolumna + '"][value="' + value + '"]').checked = true;
 
                 }
@@ -557,7 +565,6 @@ var petla = function(plecTabela, plec) {
     }
 
     paginationTable(tbody.id, 3);
-    console.log('run', plecTabela, tbody.id);
 };
 
 var addEvents = function() {  
@@ -626,7 +633,7 @@ var addEvents = function() {
         if (sprawdzony == false)
             return;
 
-        data[plec].push(dataToPush);
+        document.querySelector('#'+targetTable).dataset.newtr = '1'; // dodaje data-newtr ktory sluzy do przeskoku na odpowiedni page w przypadku dodania pracownika
         petla(targetTable, plec);
         clear('form1');
         
