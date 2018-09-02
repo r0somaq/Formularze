@@ -28,13 +28,13 @@ var tagi = [
 
 var kolorki = ['#453523', '#978409', '#908734', '#213345', '#516794', '#127948'];
 
-function checkPage(tbody, nrPP) {
+function checkPage(tbody, nrPP) { //f. ta decyduje o wyswietlaniu odpowiednich rekordow
 
     for (var tr of tbody.children) {
 
         if (tbody.dataset.newtr == '1') {
             tbody.dataset.page = Math.ceil((tbody.children.length/nrPP));
-            tbody.dataset.newtr == '0';
+            tbody.dataset.newtr = '0';
         }
         
         if (tr.dataset.page != tbody.dataset.page) {
@@ -51,7 +51,7 @@ function checkPage(tbody, nrPP) {
     tbody.dataset.page = '1';
 }
 
-function paginationTable(tbodyID, nrPP) { 
+function paginationTable(tbodyID, nrPP) {  //f. do tworzenia paginatora
 
     var tbody = document.getElementById(tbodyID); 
     var allTr = tbody.children; 
@@ -99,7 +99,8 @@ function paginationTable(tbodyID, nrPP) {
     }
 
     while (nav.firstChild)
-    nav.removeChild(nav.firstChild);
+        nav.removeChild(nav.firstChild);
+
     nav.appendChild(ul);
 
     if (allTr.length > 0) //zapobiega wyskakiwaniu bledu przy usunieciu wszystkich rekordow z danej tabeli
@@ -120,9 +121,9 @@ function avatar(form) { //funkcja do wyswietlania avatarow przy edycji/dodawaniu
     })
     
     while (avaDiv.firstChild)
-    avaDiv.removeChild(avaDiv.firstChild);
+        avaDiv.removeChild(avaDiv.firstChild);
 
-    for (var i = 1; i < 4; i++) {
+    for (var i = 1; i < 4; i++) { //i wskazuje liczbe avatarow w folderze
         
         var input = document.createElement('input');
         input.type = 'radio';
@@ -136,8 +137,6 @@ function avatar(form) { //funkcja do wyswietlania avatarow przy edycji/dodawaniu
 
         var img = document.createElement('img');
         img.src = 'img/' + plec + '/' + i + '.png';
-        //img.dataset.sex = plec; nie wiem czy potrzebne
-        //img.dataset.avatar = i;
         img.alt = 'avatar nr : ' + i;
         avaDiv.appendChild(img);
         
@@ -147,7 +146,7 @@ function avatar(form) { //funkcja do wyswietlania avatarow przy edycji/dodawaniu
     }
 };
 
-function refreshTags(oldTag, newTag, action) {
+function refreshTags(oldTag, newTag, action) { // funkcja obslugujaca tagi
     
     if (action == 'edit') {
         //zmieniamy data-name i innerText span'ow ze starym tagiem na nowa wartosc
@@ -183,7 +182,14 @@ function refreshTags(oldTag, newTag, action) {
         newOption.appendChild(newSpan2);
 
         document.getElementById('selectTags').appendChild(newOption);
-        petlaTagi(0);            
+        petlaTagi(0);    
+
+    }
+    else { //usuwanie tagu
+
+        $('#selectTags option[name="' + oldTag + '"]').remove(); //usuwamy tag z formularza edycjii
+        $('#tagsAddWorker label span[data-name="' + oldTag + '"]')[0].parentElement.remove(); //usuwamy tag z formularza dodawania
+        petlaTagi(0);
 
     }
 
@@ -193,7 +199,7 @@ function refreshTags(oldTag, newTag, action) {
 function clear(formId){
 
     var form = document.getElementById(formId);
-    var inputs = form.querySelectorAll('input[type="text"],textarea, input[name="tags"]:checked');
+    var inputs = form.querySelectorAll('input[type="text"], textarea, input[name="tags"]:checked');
     form.removeAttribute('data-row');
     
     var count = inputs.length;
@@ -212,9 +218,6 @@ function clear(formId){
         
         }
     }
-
-    form.querySelector('input[name="avatar"][value="1"]').checked = true;
-
 };
 
 function validate(formId, exception) {
@@ -237,7 +240,7 @@ function validate(formId, exception) {
         }
     } 
 
-    if (formId == 'form1' || formId == 'form2') {
+    if (formId == 'form1' || formId == 'form2') { //formularz dodawania, lub formularz edycji
         
         var emailField = form.querySelector('input[name="email"')
         var formEmail = emailField.value;
@@ -255,6 +258,19 @@ function validate(formId, exception) {
                 alertMsg += '\nPodany e-mail juz istnieje w bazie!';
                 break;
                 
+            }
+        }
+    }
+    else if (formId == 'form3') { //formularz z tagami
+
+        for (var el of tagi) {
+
+            if (el.tagName == exception) {
+
+                isValid = false;
+                alertMsg = 'Taki tag juz istnieje. Prosze wprowadzic inna nazwe tagu.';
+                break;
+
             }
         }
     }
@@ -326,12 +342,12 @@ function petlaTagi(init) {
             if (!confirm('Are you sure to delete this record?'))
                 return;
 
-            var btn = e.target;
-            var row2 = btn.getAttribute('data-row'); 
-            tagi.splice(row2, 1);
+            
+            var deleteTag = e.target.parentElement.querySelector('td[data-name]').innerText; //identyfikator tagu do usuniecia
+            tagi.splice(e.target.getAttribute('data-row'), 1); //usuniecie odpowiedniego wiersza
 
             // aktualizacja listy tagow w form1 i form2
-            refreshTags();
+            refreshTags(deleteTag); //jako parametr oldTag
             document.getElementById('form3').setAttribute('data-btn', 0);
             document.getElementById('tagBtn').value = 'Dodaj nowy rekord';
         } 
@@ -618,7 +634,8 @@ var addEvents = function() {
             else if (keyName == 'tags') {
 
                 if (inputs[i].nextElementSibling.innerText != '') // zapobiega przed nieutworzeniem kolumny dla rekordu bez tagow
-                tagsTab.push(inputs[i].nextElementSibling.innerText); // dodajemy zawartosc spana przy checkboxie
+                    tagsTab.push(inputs[i].nextElementSibling.innerText);
+                
                 dataToPush[keyName] = tagsTab; 
 
             }   
@@ -633,9 +650,11 @@ var addEvents = function() {
         if (sprawdzony == false)
             return;
 
+        data[plec].push(dataToPush);
         document.querySelector('#'+targetTable).dataset.newtr = '1'; // dodaje data-newtr ktory sluzy do przeskoku na odpowiedni page w przypadku dodania pracownika
         petla(targetTable, plec);
         clear('form1');
+        form.querySelector('input[name="avatar"][value="1"]').checked = true; // zaznacza pierwsza opcje radio w avatarach w form dodawania pracownikow
         
     });
 
@@ -717,7 +736,7 @@ var addEvents = function() {
 
         var form = document.getElementById('form3');
         var inputs = form.querySelectorAll('input[type="text"], textarea');
-
+        var inputTagName = form.querySelector('input[type="text"]').value; //wartosc potrzebna do sprawdzenia czy dany tag juz istnieje
 
         var row = form.getAttribute('data-row');
         var dataEdit = form.getAttribute('data-btn')
@@ -733,7 +752,7 @@ var addEvents = function() {
 
                 var keyName = inputs[i].name;
                 
-                if (validate('form3') == false)
+                if (validate('form3', inputTagName) == false)
                     return;
 
                 tagi[row][keyName] = inputs[i].value;
@@ -757,7 +776,8 @@ var addEvents = function() {
                 newTag = inputs[i].value;
                 
             }
-            if (validate('form3') == false)
+        
+        if (validate('form3', inputTagName) == false)
             return;
             
             tagi.push(dataToPush);
@@ -767,4 +787,3 @@ var addEvents = function() {
         }
     });
 }
-
